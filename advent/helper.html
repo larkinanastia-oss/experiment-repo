@@ -1,0 +1,154 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="noindex, nofollow">
+  <meta name="referrer" content="no-referrer">
+  <title>Адвент-квест · помощник для родителей</title>
+  <style>
+    :root {
+      --bg: #f6f4ef; --card: #fff; --ink: #1d2433; --muted: #5b6475; --line: #ddd5c7;
+      --red: #b3202a; --green: #1f7a4d; --gold: #f2b705; --warn-bg: #fff4cc;
+      color-scheme: light;
+    }
+    * { box-sizing: border-box; }
+    body { margin: 0; background: var(--bg); color: var(--ink);
+      font: 16px/1.45 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; }
+    main { max-width: 860px; margin: 0 auto; padding: 24px 16px 64px; }
+    h1 { margin: 0 0 4px; font-size: 26px; }
+    h2 { margin: 0 0 12px; font-size: 20px; }
+    h3 { margin: 0 0 10px; font-size: 18px; }
+    p { margin: 6px 0; }
+    .muted { color: var(--muted); }
+    .card { background: var(--card); border: 1px solid var(--line); border-radius: 14px; padding: 16px; margin: 16px 0; }
+    .grid { display: grid; gap: 10px 14px; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); }
+    label { display: block; font-weight: 600; font-size: 14px; margin-bottom: 4px; }
+    input[type=text], input[type=password], input[type=date], textarea, select {
+      width: 100%; font: inherit; padding: 9px 10px; border: 1px solid #c8c0b2; border-radius: 9px; background: #fff; color: var(--ink);
+    }
+    textarea { min-height: 160px; font: 13px/1.4 ui-monospace, Menlo, monospace; }
+    .check { display: flex; gap: 8px; align-items: center; font-weight: 600; }
+    button {
+      font: inherit; font-weight: 700; padding: 10px 16px; border-radius: 10px; cursor: pointer;
+      border: 2px solid var(--ink); background: #fff; color: var(--ink);
+    }
+    button.primary { background: var(--green); border-color: var(--green); color: #fff; }
+    button:disabled { opacity: .55; cursor: default; }
+    .row { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
+    details.day { border: 1px solid var(--line); border-radius: 12px; padding: 0 14px; margin: 12px 0; background: #fffdf8; }
+    details.day[open] { padding-bottom: 12px; }
+    details.day summary { cursor: pointer; padding: 12px 0; font-weight: 700; }
+    .task { display: grid; grid-template-columns: 30px 1fr; gap: 8px; align-items: start; padding: 12px 0; border-top: 1px solid var(--line); }
+    .task .n { font-weight: 800; font-size: 18px; padding-top: 22px; }
+    .task-body { display: grid; gap: 8px; }
+    .task textarea { min-height: 64px; font: inherit; }
+    .task .norm { font-size: 13px; color: var(--muted); margin-top: 3px; min-height: 1em; }
+    .task .norm.bad { color: var(--red); }
+    .warn { background: var(--warn-bg); border: 1px solid var(--gold); border-radius: 10px; padding: 10px 12px; }
+    .errors { color: var(--red); white-space: pre-line; }
+    .ok { color: var(--green); font-weight: 700; }
+    code { background: #efe9dd; padding: 1px 5px; border-radius: 5px; }
+  </style>
+</head>
+<body>
+<main>
+  <h1>🎄 Адвент-квест: помощник для родителей</h1>
+  <p class="muted">Заполните ответы и подсказки для одного ребёнка и нажмите «Создать файл».
+    Получится <code>daria.json</code> или <code>seva.json</code>, в котором ответы и подсказки спрятаны:
+    в коде страницы их не видно. Эта страница ничего никуда не отправляет — всё считается в браузере.</p>
+
+  <div class="card">
+    <h2>Открыть готовый файл</h2>
+    <p class="muted">Чтобы изменить уже созданный файл: выберите его и введите пароль родителя.</p>
+    <div class="row">
+      <input type="file" id="openFile" accept=".json,application/json">
+      <input type="password" id="openPw" placeholder="Пароль родителя" style="max-width:220px">
+      <button type="button" id="openBtn">Открыть</button>
+    </div>
+    <p id="openMsg" class="muted"></p>
+  </div>
+
+  <form id="form" autocomplete="off">
+    <div class="card">
+      <h2>Ребёнок</h2>
+      <div class="grid">
+        <div>
+          <label for="child">Файл (латиницей, будет в ссылке ?kid=)</label>
+          <input type="text" id="child" required pattern="[a-z0-9_\-]+" placeholder="daria">
+        </div>
+        <div>
+          <label for="name">Имя для приветствия</label>
+          <input type="text" id="name" required placeholder="Дарья">
+        </div>
+        <div>
+          <label for="gender">Кнопка «Готов(а) отвечать»</label>
+          <select id="gender">
+            <option value="f">Готова отвечать (девочка)</option>
+            <option value="m">Готов отвечать (мальчик)</option>
+          </select>
+        </div>
+      </div>
+      <p class="check" style="margin-top:12px">
+        <input type="checkbox" id="numeric">
+        <label for="numeric" style="margin:0">Только числа — показывать цифровую клавиатуру</label>
+      </p>
+    </div>
+
+    <div class="card">
+      <h2>Задания</h2>
+      <p class="muted">В каждом дне до 5 заданий; пустые задания в конце не учитываются.
+        Текст задания ребёнок увидит в приложении (следующее задание открывается только после правильного ответа).
+        Несколько вариантов ответа — через запятую, например <code>5, пять</code>.
+        Регистр, лишние пробелы, точка в конце и «ё/е» не важны; «07» = «7».
+        Ответы — только числа или русские слова. Подсказка ведёт к месту, где спрятано следующее задание;
+        если задания не прячутся отдельно, оставьте её пустой.</p>
+      <div id="days"></div>
+    </div>
+
+    <div class="card">
+      <h2>Пароль родителя</h2>
+      <p class="muted">Нужен, чтобы в режиме родителя (<code>?parent=1</code>) увидеть ответы и перейти к любому заданию,
+        и чтобы потом снова открыть файл здесь. Выберите такой, который дети не угадают. Забудете — придётся заполнить заново.</p>
+      <div class="grid">
+        <div><label for="pw1">Пароль</label><input type="password" id="pw1" autocomplete="new-password" required></div>
+        <div><label for="pw2">Ещё раз</label><input type="password" id="pw2" autocomplete="new-password" required></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="row">
+        <button type="submit" class="primary" id="buildBtn">Создать файл</button>
+        <button type="button" id="exportPlain">Скачать черновик (открытый текст)</button>
+        <label class="row" style="margin:0;font-weight:600">
+          <input type="file" id="importPlain" accept=".json,application/json" style="display:none">
+          <button type="button" id="importPlainBtn">Загрузить черновик</button>
+        </label>
+      </div>
+      <p class="muted" style="margin-top:8px">Черновик — это обычный файл с ответами. Храните его у себя и
+        <b>не загружайте в репозиторий</b>.</p>
+      <p id="errors" class="errors"></p>
+    </div>
+  </form>
+
+  <div class="card" id="result" hidden>
+    <h2>Готово</h2>
+    <p class="ok" id="resultMsg"></p>
+    <div class="row" style="margin:10px 0">
+      <button type="button" class="primary" id="downloadBtn">Скачать файл</button>
+      <button type="button" id="copyBtn">Скопировать текст</button>
+    </div>
+    <div class="warn">
+      <p><b>Как загрузить на GitHub:</b> откройте репозиторий → папка <code>advent</code> → нужный файл
+        (например, <code>daria.json</code>) → значок карандаша → выделите всё и вставьте скопированный текст → <b>Commit changes</b>.
+        Или <b>Add file → Upload files</b> и перетащите скачанный файл. Через минуту-две страница обновится.</p>
+    </div>
+    <p style="margin-top:12px"><label for="out">Содержимое файла</label></p>
+    <textarea id="out" readonly></textarea>
+  </div>
+</main>
+
+<script src="shared.js"></script>
+<script src="helper.js"></script>
+</body>
+</html>

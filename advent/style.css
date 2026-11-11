@@ -1,0 +1,360 @@
+/* Advent Quest — festive, high-contrast, phone-first. */
+
+:root {
+  --bg: #fdf8f0;
+  --card: #ffffff;
+  --ink: #1d2433;
+  --muted: #5b6475;
+  /* Palette */
+  --bg-top: #516F65;
+  --bg-bottom: #20302F;
+  --btn: #C04A40;
+  --btn-dark: #8E352E;
+  --btn-text: #F5E5D6;
+  --on-bg: #EEF0E7;
+  --on-bg-light: #F9FAF6;
+  --serif: "PT Serif", Georgia, "Times New Roman", serif;
+  --door: #F5E5D6;
+  --red: #C04A40;
+  --red-dark: #8E352E;
+  --green: #1f7a4d;
+  --green-soft: #e3f3ea;
+  --gold: #f2b705;
+  --gold-soft: #fff4cc;
+  --line: #e7dfd2;
+  --locked: #c9cfd8;
+  --radius: 22px;
+  --shadow: 0 6px 18px rgba(0, 0, 0, 0.25);
+  color-scheme: light;
+}
+
+* { box-sizing: border-box; }
+
+h1, h2, h3, h4, b, strong, th { font-weight: 500; }
+
+html {
+  -webkit-text-size-adjust: 100%;
+  min-height: 100%;
+  background: linear-gradient(180deg, var(--bg-top) 0%, var(--bg-bottom) 100%) no-repeat;
+  background-color: var(--bg-bottom);
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  background: transparent;
+  color: var(--ink);
+  font-family: "Golos Text", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  font-weight: 500;
+  font-size: 20px;
+  line-height: 1.35;
+}
+
+/* A few faint snowflakes at the top of the page */
+.snow {
+  position: fixed;
+  inset: 0 0 auto 0;
+  height: 230px;
+  pointer-events: none;
+  background:
+    radial-gradient(circle at 10% 30%, rgba(255, 255, 255, .35) 0 3px, transparent 4px),
+    radial-gradient(circle at 30% 70%, rgba(255, 255, 255, .25) 0 2px, transparent 3px),
+    radial-gradient(circle at 55% 25%, rgba(255, 255, 255, .35) 0 3px, transparent 4px),
+    radial-gradient(circle at 75% 60%, rgba(255, 255, 255, .25) 0 2px, transparent 3px),
+    radial-gradient(circle at 92% 35%, rgba(255, 255, 255, .35) 0 3px, transparent 4px);
+  z-index: 0;
+}
+
+.app {
+  position: relative;
+  z-index: 1;
+  max-width: 560px;
+  margin: 0 auto;
+  padding: calc(16px + env(safe-area-inset-top)) 16px calc(32px + env(safe-area-inset-bottom));
+}
+
+.loading, .fatal {
+  background: var(--card);
+  border-radius: var(--radius);
+  padding: 24px;
+  margin-top: 60px;
+  text-align: center;
+  box-shadow: var(--shadow);
+}
+.fatal small { display: block; margin-top: 12px; color: var(--muted); font-size: 16px; }
+
+/* ---------- header ---------- */
+
+.top {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 48px;
+  color: var(--on-bg);
+}
+.top .spacer { flex: 1; }
+
+.icon-btn {
+  appearance: none;
+  border: 0;
+  background: var(--btn);
+  color: var(--btn-text);
+  font: inherit;
+  font-size: 18px;
+  font-weight: 500;
+  min-width: 48px;
+  min-height: 48px;
+  padding: 0 14px;
+  border-radius: 999px;
+  cursor: pointer;
+}
+.icon-btn:active { transform: scale(0.97); }
+
+.hello {
+  color: var(--on-bg-light);
+  font-family: var(--serif);
+  font-size: 36px;
+  font-weight: 700;
+  margin: 8px 0 2px;
+}
+.sub {
+  color: var(--on-bg);
+  font-weight: 400;
+  margin: 0 0 28px;
+  font-size: 19px;
+}
+
+.parent-banner {
+  background: var(--gold-soft);
+  border: 2px dashed var(--gold);
+  color: var(--ink);
+  border-radius: 14px;
+  padding: 8px 12px;
+  font-size: 16px;
+  margin-bottom: 12px;
+}
+
+/* ---------- calendar ---------- */
+
+.doors {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 14px;
+}
+.doors .door:first-child { grid-column: 1 / -1; }
+
+.door {
+  appearance: none;
+  font: inherit;
+  color: inherit;
+  text-align: left;
+  border: 3px solid transparent;
+  background: var(--door);
+  border-radius: var(--radius);
+  padding: 16px;
+  min-height: 132px;
+  box-shadow: var(--shadow);
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 6px;
+  position: relative;
+  overflow: hidden;
+}
+.door:active { transform: scale(0.98); }
+.door .date { font-family: var(--serif); font-weight: 700; display: flex; flex-direction: column; }
+.door .day-num { font-size: clamp(33px, 10.5vw, 45px); line-height: 1; }
+.door .month { font-size: 17px; line-height: 1.2; margin-top: 2px; }
+.door .state { font-size: 17px; font-weight: 500; }
+.door .badge { position: absolute; top: 12px; right: 14px; font-size: 34px; }
+
+.door.open .state { color: var(--btn); }
+.door.done .state { color: var(--bg-top); }
+.door.locked { opacity: .7; }
+.door.locked .state { color: var(--muted); }
+
+/* ---------- day ---------- */
+
+.card {
+  background: var(--card);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  padding: 20px;
+  margin-bottom: 16px;
+}
+
+.day-title { color: var(--on-bg); font-family: var(--serif); font-size: 32px; font-weight: 700; margin: 6px 0 18px; }
+
+
+.task-card { background: var(--door); padding-bottom: 25px; }
+.task-text {
+  color: var(--bg-bottom);
+  font-size: 23px;
+  font-weight: 500;
+  line-height: 1.4;
+  margin: 0 0 16px;
+  white-space: pre-line;
+}
+
+.answer {
+  display: block;
+  width: 100%;
+  font: inherit;
+  font-size: 28px;
+  line-height: 1.2;
+  font-weight: 500;
+  text-align: left;
+  padding: 18px 28px;
+  border: 3px solid var(--line);
+  border-radius: 200px;
+  background: #fff;
+  color: var(--ink);
+  outline: none;
+}
+.answer::placeholder { color: #C9AE96; opacity: 1; }
+.answer:focus { border-color: var(--line); box-shadow: none; }
+.answer.shake { animation: shake .4s; }
+@keyframes shake {
+  20%, 60% { transform: translateX(-8px); }
+  40%, 80% { transform: translateX(8px); }
+}
+
+.big-btn {
+  appearance: none;
+  display: block;
+  width: 100%;
+  margin-top: 14px;
+  border: 0;
+  border-radius: 200px;
+  background: var(--btn);
+  color: var(--btn-text);
+  font: inherit;
+  font-size: 28px;
+  font-weight: 500;
+  padding: 16px;
+  min-height: 64px;
+  cursor: pointer;
+  box-shadow: 0 5px 0 var(--btn-dark);
+}
+.big-btn:active { transform: translateY(3px); box-shadow: 0 2px 0 var(--btn-dark); }
+.big-btn:focus, .big-btn:focus-visible { outline: none; }
+.big-btn[disabled] { opacity: .6; }
+
+
+.feedback { margin: 16px 0 0; text-align: center; font-size: 22px; }
+.feedback:empty { display: none; }
+.feedback.wrong { color: var(--red); }
+.feedback .nudge { display: block; margin-top: 6px; color: var(--muted); font-size: 20px; }
+
+/* Same look as the task card: beige card, dark-green Golos Text, no border */
+.prize {
+  text-align: center;
+  background: var(--door);
+}
+.prize .big { font-size: 56px; line-height: 1; }
+.prize p { margin: 12px 0 0; color: var(--bg-bottom); font-size: 23px; font-weight: 500; line-height: 1.4; }
+
+
+/* ---------- search for the next hidden task ---------- */
+
+/* Same look as the task card */
+.search { text-align: center; background: var(--door); padding-bottom: 25px; }
+.search .big { font-size: 56px; line-height: 1; }
+.search .hint-text { margin: 12px 0 0; color: var(--bg-bottom); font-size: 23px; font-weight: 500; line-height: 1.4; }
+
+/* ---------- locked ---------- */
+
+.locked-card { text-align: center; }
+.locked-card .big { font-size: 64px; }
+.locked-card h2 { font-size: 26px; margin: 8px 0; }
+.countdown { font-size: 30px; font-weight: 500; color: var(--red); margin: 8px 0 0; }
+
+/* ---------- overlay (correct answer / day finished) ---------- */
+
+.overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 20;
+  background: rgba(20, 30, 29, 0.6);
+  display: grid;
+  place-items: center;
+  padding: 16px;
+  animation: fade .25s ease-out;
+}
+@keyframes fade { from { opacity: 0; } }
+.overlay .panel {
+  width: 100%;
+  max-width: 480px;
+  background: var(--door);
+  border-radius: 28px;
+  padding: 26px 20px 20px;
+  text-align: center;
+  box-shadow: 0 20px 50px rgba(0, 0, 0, .3);
+  animation: rise .35s cubic-bezier(.2, 1.4, .4, 1);
+}
+@keyframes rise { from { transform: translateY(30px) scale(.9); opacity: 0; } }
+.overlay .big { font-size: 64px; line-height: 1; }
+.overlay h2 { margin: 10px 0 6px; font-size: 32px; font-weight: 500; color: var(--bg-top); }
+.overlay .hint-text { font-size: 30px; font-weight: 500; margin: 14px 0 4px; line-height: 1.25; color: #7A5640; }
+
+.overlay.finale h2 { color: var(--red); font-size: 36px; }
+
+/* ---------- confetti ---------- */
+
+.confetti { position: fixed; inset: 0; pointer-events: none; z-index: 30; overflow: hidden; }
+.confetti i {
+  position: absolute;
+  top: -20px;
+  width: 10px;
+  height: 16px;
+  border-radius: 3px;
+  animation: fall linear forwards;
+}
+@keyframes fall {
+  to { transform: translate3d(var(--dx), 110vh, 0) rotate(var(--rot)); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .confetti { display: none; }
+  .overlay, .overlay .panel, .answer.shake { animation: none; }
+}
+
+/* ---------- parent panel ---------- */
+
+.parent {
+  margin-top: 24px;
+  font-size: 16px;
+  background: #fff;
+  border: 2px dashed var(--gold);
+}
+.parent h3 { margin: 0 0 8px; font-size: 18px; }
+.parent p { margin: 6px 0; }
+.parent .row { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; margin: 8px 0; }
+.parent input[type=password] {
+  font: inherit; font-size: 16px; padding: 10px 12px; border-radius: 10px;
+  border: 2px solid var(--line); flex: 1; min-width: 160px;
+}
+.parent button {
+  font: inherit; font-size: 15px; font-weight: 500;
+  padding: 9px 12px; min-height: 40px; border-radius: 10px;
+  border: 2px solid var(--ink); background: #fff; color: var(--ink); cursor: pointer;
+}
+.parent button.danger { border-color: var(--red); color: var(--red); }
+.parent button.current { background: var(--ink); color: #fff; }
+.parent .err { color: var(--red); }
+.parent table { width: 100%; border-collapse: collapse; margin: 6px 0 4px; }
+.parent th, .parent td { text-align: left; padding: 5px 4px; border-bottom: 1px solid var(--line); vertical-align: top; }
+.parent th { font-size: 14px; color: var(--muted); }
+.parent .day-block { margin-top: 16px; padding-top: 10px; border-top: 2px solid var(--line); }
+.parent .day-block h4 { margin: 0 0 4px; font-size: 17px; }
+.parent .prize-line { color: var(--green); }
+
+@media (min-width: 520px) {
+  .doors { grid-template-columns: repeat(3, 1fr); }
+  .doors .door:first-child { grid-column: auto; }
+}
+
+.search .big-btn[hidden] { display: none; }
+
+/* Text at the top of the page sits 32px from the left edge (twice the page gutter). */
+.hello, .sub, .day-title { padding-left: 16px; }
