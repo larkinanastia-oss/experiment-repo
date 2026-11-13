@@ -6,15 +6,15 @@
   --ink: #1d2433;
   --muted: #5b6475;
   /* Palette */
-  --bg-top: #516F65;
+  --bg-top: #527066;
   --bg-bottom: #20302F;
   --btn: #C04A40;
   --btn-dark: #8E352E;
   --btn-text: #F5E5D6;
   --on-bg: #EEF0E7;
-  --on-bg-light: #F9FAF6;
-  --serif: "PT Serif", Georgia, "Times New Roman", serif;
-  --door: #F5E5D6;
+  --on-bg-light: #F7E7CF;
+  --serif: "Playfair Display", Georgia, "Times New Roman", serif;
+  --door: #F5DDC5;
   --red: #C04A40;
   --red-dark: #8E352E;
   --green: #1f7a4d;
@@ -114,11 +114,11 @@ body {
   color: var(--on-bg-light);
   font-family: var(--serif);
   font-size: 36px;
-  font-weight: 700;
+  font-weight: 800;
   margin: 8px 0 2px;
 }
 .sub {
-  color: var(--on-bg);
+  color: #C6C3AF;
   font-weight: 400;
   margin: 0 0 28px;
   font-size: 19px;
@@ -141,7 +141,7 @@ body {
   grid-template-columns: repeat(2, 1fr);
   gap: 14px;
 }
-.doors .door:first-child { grid-column: 1 / -1; }
+.doors .door:last-child { grid-column: 1 / -1; }
 
 .door {
   appearance: none;
@@ -163,11 +163,13 @@ body {
   overflow: hidden;
 }
 .door:active { transform: scale(0.98); }
-.door .date { font-family: var(--serif); font-weight: 700; display: flex; flex-direction: column; }
+.door .date { font-family: var(--serif); font-weight: 800; color: var(--bg-bottom); display: flex; flex-direction: column; }
 .door .day-num { font-size: clamp(33px, 10.5vw, 45px); line-height: 1; }
 .door .month { font-size: 17px; line-height: 1.2; margin-top: 2px; }
 .door .state { font-size: 17px; font-weight: 500; }
-.door .badge { position: absolute; top: 12px; right: 14px; font-size: 34px; }
+.door .badge { position: absolute; top: 12px; right: 12px; width: 52px; height: 52px; object-fit: contain; mix-blend-mode: darken; }
+/* The tree picture on the task, hint, end-of-day and locked cards */
+.card-tree { display: block; width: 76px; height: 76px; object-fit: contain; margin: 0 auto 4px; mix-blend-mode: darken; }
 
 .door.open .state { color: var(--btn); }
 .door.done .state { color: var(--bg-top); }
@@ -184,7 +186,7 @@ body {
   margin-bottom: 16px;
 }
 
-.day-title { color: var(--on-bg); font-family: var(--serif); font-size: 32px; font-weight: 700; margin: 6px 0 18px; }
+.day-title { color: var(--on-bg); font-family: var(--serif); font-size: 32px; font-weight: 800; margin: 6px 0 18px; }
 
 
 .task-card { background: var(--door); padding-bottom: 25px; }
@@ -265,7 +267,7 @@ body {
 
 /* ---------- locked ---------- */
 
-.locked-card { text-align: center; }
+.locked-card { text-align: center; background: var(--door); }
 .locked-card .big { font-size: 64px; }
 .locked-card h2 { font-size: 26px; margin: 8px 0; }
 .countdown { font-size: 30px; font-weight: 500; color: var(--red); margin: 8px 0 0; }
@@ -349,10 +351,6 @@ body {
 .parent .day-block h4 { margin: 0 0 4px; font-size: 17px; }
 .parent .prize-line { color: var(--green); }
 
-@media (min-width: 520px) {
-  .doors { grid-template-columns: repeat(3, 1fr); }
-  .doors .door:first-child { grid-column: auto; }
-}
 
 .search .big-btn[hidden] { display: none; }
 

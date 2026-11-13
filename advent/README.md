@@ -26,7 +26,9 @@ Once GitHub Pages is on (see below):
 
 ## Filling in the real content
 
-`daria.json` has Daria's real tasks, answers and hiding places (4 tasks per day). `seva.json` is still placeholder content. Both are protected by the parent password, which is kept outside this repository.
+`daria.json` and `seva.json` have each child's real tasks, answers and hiding places (4 tasks per day). Both are protected by the parent password, which is kept outside this repository.
+
+To test locally, run `python3 tools/serve.py` from the repository folder and open `http://localhost:8765/advent/?kid=daria` (or `?kid=seva`). That server tells the browser never to keep old copies, so a normal reload shows the latest version.
 
 Only each day's first task text is readable in the public file. The later task texts, all hints and all answers are encrypted.
 

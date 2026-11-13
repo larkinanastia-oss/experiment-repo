@@ -14,6 +14,8 @@
   // After a hint, the «Задание у меня» button unlocks only after this wait (not in parent mode).
   var SEARCH_WAIT_MS = 3 * 60 * 1000;
   function now() { return Date.now(); }
+  // Tree picture on the cards; fresh address per visit so an updated picture always shows.
+  var TREE_IMG = 'tree.jpg?v=' + (window.__assetVersion || Date.now());
 
   var MONTHS = ['января', 'февраля', 'марта', 'апреля', 'мая', 'июня', 'июля',
     'августа', 'сентября', 'октября', 'ноября', 'декабря'];
@@ -259,13 +261,12 @@
       var count = (dayState[di] || []).length;
       var cls = 'door ' + (!unlocked ? 'locked' : done ? 'done' : 'open');
       var state = !unlocked ? 'Закрыто' : done ? 'Пройдено!' : count ? 'Задание ' + (count + 1) : 'Открыто!';
-      var badge = !unlocked ? '🔒' : done ? '🎁' : '✨';
       doors.appendChild(el('button', {
         class: cls, type: 'button',
         'aria-label': prettyDate(day.unlockDate) + ', ' + state,
         onclick: function () { go('day', di); }
       }, [
-        el('span', { class: 'badge', text: badge }),
+        el('img', { class: 'badge', src: TREE_IMG, alt: '' }),
         el('span', { class: 'date' }, [
           el('span', { class: 'day-num', text: String(+day.unlockDate.slice(8, 10)) }),
           el('span', { class: 'month', text: MONTHS[+day.unlockDate.slice(5, 7) - 1] })
@@ -303,7 +304,7 @@
     if (hidingHint && loadFound(day.day) < ti + 1) {
       // The next task is hidden in the flat: show only where to look, not the task itself.
       card.className = 'card search';
-      card.appendChild(el('div', { class: 'big', text: '🔎' }));
+      card.appendChild(el('img', { class: 'card-tree', src: TREE_IMG, alt: '' }));
       card.appendChild(el('p', { class: 'hint-text', text: hidingHint }));
       var openAt = PARENT ? 0 : loadHintAt(day.day) + SEARCH_WAIT_MS;
       var readyText = content.gender === 'f' ? 'Готова отвечать' : content.gender === 'm' ? 'Готов отвечать' : 'Готов(а) отвечать';
@@ -350,7 +351,7 @@
       // The present's place was shown in the celebration; this card only says what comes next.
       var lastDay = di === content.days.length - 1;
       app.appendChild(el('div', { class: 'card prize' }, [
-        el('div', { class: 'big', text: lastDay ? '🎄' : '🎁' }),
+        el('img', { class: 'card-tree', src: TREE_IMG, alt: '' }),
         el('p', { text: lastDay ? 'С Новым годом!' : 'Следующий конверт открой завтра утром.' })
       ]));
     }
@@ -360,7 +361,7 @@
     var target = unlockTime(day.unlockDate);
     var cd = el('p', { class: 'countdown' });
     app.appendChild(el('div', { class: 'card locked-card' }, [
-      el('div', { class: 'big', text: '🔒' }),
+      el('img', { class: 'card-tree', src: TREE_IMG, alt: '' }),
       el('h2', { text: 'Этот день откроется ' + prettyDate(day.unlockDate) + ' в ' + UNLOCK_LABEL }),
       cd
     ]));

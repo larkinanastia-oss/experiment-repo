@@ -148,7 +148,12 @@
   </div>
 </main>
 
-<script src="shared.js"></script>
-<script src="helper.js"></script>
+  <script>
+    (function () {
+      var v = window.__assetVersion || Date.now();
+      document.write('<script src="shared.js?v=' + v + '"><\/script>');
+      document.write('<script src="helper.js?v=' + v + '"><\/script>');
+    })();
+  </script>
 </body>
 </html>

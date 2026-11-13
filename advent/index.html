@@ -5,12 +5,20 @@
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <meta name="robots" content="noindex, nofollow">
   <meta name="referrer" content="no-referrer">
-  <meta name="theme-color" content="#516F65">
+  <meta name="theme-color" content="#527066">
   <title>Адвент-квест</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Golos+Text:wght@400;500&family=PT+Serif:wght@700&display=swap&subset=cyrillic" rel="stylesheet">
-  <link rel="stylesheet" href="style.css">
+  <link href="https://fonts.googleapis.com/css2?family=Golos+Text:wght@400;500&family=Playfair+Display:wght@800&display=swap&subset=cyrillic" rel="stylesheet">
+  <script>
+    // Load the page's own files with a fresh address each time, so phones and
+    // browsers never show an old cached version after an update.
+    (function () {
+      var v = Date.now();
+      document.write('<link rel="stylesheet" href="style.css?v=' + v + '">');
+      window.__assetVersion = v;
+    })();
+  </script>
 </head>
 <body>
   <div class="snow" aria-hidden="true"></div>
@@ -18,7 +26,12 @@
     <p class="loading">Загружаю…</p>
   </main>
   <div id="confetti" class="confetti" aria-hidden="true"></div>
-  <script src="shared.js"></script>
-  <script src="app.js"></script>
+  <script>
+    (function () {
+      var v = window.__assetVersion || Date.now();
+      document.write('<script src="shared.js?v=' + v + '"><\/script>');
+      document.write('<script src="app.js?v=' + v + '"><\/script>');
+    })();
+  </script>
 </body>
 </html>
