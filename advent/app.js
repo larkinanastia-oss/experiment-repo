@@ -247,10 +247,6 @@
     ]);
   }
 
-  function parentBanner() {
-    return PARENT ? el('div', { class: 'parent-banner', text: t('👀 Режим родителя: все дни открыты.', '👀 Parent mode: all days are open.') }) : null;
-  }
-
   function render() {
     stopTimer();
     app.innerHTML = '';
@@ -268,8 +264,6 @@
     // No top bar on the calendar (it would be empty), so the greeting sits higher.
     app.appendChild(el('h1', { class: 'hello', text: t('Привет, ', 'Hi, ') + content.name + '!' }));
     app.appendChild(el('p', { class: 'sub', text: t('Каждый день задания и подарок.', 'Tasks and a present every day.') }));
-    var banner = parentBanner();
-    if (banner) app.appendChild(banner);
 
     var doors = el('div', { class: 'doors' });
     content.days.forEach(function (day, di) {
@@ -313,8 +307,6 @@
     var day = content.days[di];
     app.appendChild(header(function () { go('calendar'); }));
     app.appendChild(el('h1', { class: 'day-title', text: prettyDate(day.unlockDate) }));
-    var banner = parentBanner();
-    if (banner) app.appendChild(banner);
 
     if (!isUnlocked(day)) { renderLocked(day); return; }
 
