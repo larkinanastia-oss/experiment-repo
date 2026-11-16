@@ -25,6 +25,7 @@
   function normalize(input) {
     var s = String(input == null ? '' : input).normalize('NFC').toLowerCase();
     s = s.replace(/ё/g, 'е');
+    s = s.replace(/[’‘`]/g, "'");
     s = s.replace(/[()!?«»"]/g, ' ');
     s = s.replace(/\s+/g, ' ').trim();
     s = s.replace(/[.…]+$/, '').trim();
@@ -193,6 +194,10 @@
         name: source.name,
         keyboard: source.keyboard === 'numeric' ? 'numeric' : 'text',
         gender: source.gender === 'f' || source.gender === 'm' ? source.gender : '',
+        // Optional: English copy, all days open, and whose pictures to borrow (the demo).
+        lang: source.lang === 'en' ? 'en' : undefined,
+        demo: source.demo ? true : undefined,
+        pictures: source.pictures || undefined,
         salt: salt,
         days: r[0],
         parent: r[1]

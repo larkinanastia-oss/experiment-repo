@@ -5,6 +5,11 @@
   var params = new URLSearchParams(location.search);
   var KID = (params.get('kid') || '').toLowerCase();
   var PARENT = params.get('parent') === '1';
+  // English copy when the content file says lang: 'en' (the demo); guessed from the link until it loads.
+  var EN = KID === 'demo';
+  function t(ru, en) { return EN ? en : ru; }
+  // The demo opens every day and shows the «ready» button at once.
+  var DEMO = false;
   var app = document.getElementById('app');
   var confettiBox = document.getElementById('confetti');
 
@@ -15,12 +20,19 @@
   var SEARCH_WAIT_MS = 3 * 60 * 1000;
   function now() { return Date.now(); }
   // Tree picture on the cards; fresh address per visit so an updated picture always shows.
+  // Whose pictures to show (the demo borrows Daria's).
+  var PICS = KID;
   var TREE_IMG = 'tree.jpg?v=' + (window.__assetVersion || Date.now());
   function dayImage(day, unlocked) {
-    var name = unlocked ? KID + '-' + day.day : 'lock-' + day.day;
+    var name = unlocked ? PICS + '-' + day.day : 'lock-' + day.day;
     return 'days/' + name + '.jpg?v=' + (window.__assetVersion || '');
   }
 
+  var MONTHS_EN = ['January', 'February', 'March', 'April', 'May', 'June', 'July',
+    'August', 'September', 'October', 'November', 'December'];
+  var PRAISE_EN = ['Correct!', 'Well done!', 'Yay, that’s right!', 'Great!', 'Excellent!'];
+  var TRY_AGAIN_EN = ['Not yet. Try again!', 'Almost! Think a little more.',
+    'Not quite. Try again!', 'Hmm, let’s try once more!'];
   var MONTHS = ['января', 'февраля', 'марта', 'апреля', 'мая', 'июня', 'июля',
     'августа', 'сентября', 'октября', 'ноября', 'декабря'];
   var PRAISE = ['Верно!', 'Молодец!', 'Ура, правильно!', 'Здорово!', 'Отлично!'];
@@ -102,7 +114,7 @@
     return d[2] + ' ' + MONTHS[d[1] - 1];
   }
   function isUnlocked(day) {
-    return PARENT || now() >= unlockTime(day.unlockDate);
+    return PARENT || DEMO || now() >= unlockTime(day.unlockDate);
   }
 
   function plural(n, one, few, many) {
@@ -112,16 +124,17 @@
     return many;
   }
   function countdownText(ms) {
-    if (ms <= 0) return 'Уже открывается!';
+    if (ms <= 0) return t('Уже открывается!', 'Opening now!');
     var s = Math.floor(ms / 1000);
     var d = Math.floor(s / 86400), h = Math.floor(s % 86400 / 3600),
         m = Math.floor(s % 3600 / 60), sec = s % 60;
     var out = [];
-    if (d) out.push(d + ' ' + plural(d, 'день', 'дня', 'дней'));
-    if (d || h) out.push(h + ' ' + plural(h, 'час', 'часа', 'часов'));
-    out.push(m + ' ' + plural(m, 'минута', 'минуты', 'минут'));
-    if (!d) out.push(sec + ' ' + plural(sec, 'секунда', 'секунды', 'секунд'));
-    return 'Осталось:\n' + out.join(' ');
+    function unit(n, one, few, many, en) { return n + ' ' + (EN ? en + (n === 1 ? '' : 's') : plural(n, one, few, many)); }
+    if (d) out.push(unit(d, 'день', 'дня', 'дней', 'day'));
+    if (d || h) out.push(unit(h, 'час', 'часа', 'часов', 'hour'));
+    out.push(unit(m, 'минута', 'минуты', 'минут', 'minute'));
+    if (!d) out.push(unit(sec, 'секунда', 'секунды', 'секунд', 'second'));
+    return t('Осталось:', 'Time left:') + '\n' + out.join(' ');
   }
 
   /* ---------- tiny DOM helper ---------- */
@@ -229,13 +242,13 @@
 
   function header(backTo) {
     return el('div', { class: 'top' }, [
-      backTo ? el('button', { class: 'icon-btn', type: 'button', text: '← Назад', onclick: backTo }) : null,
+      backTo ? el('button', { class: 'icon-btn', type: 'button', text: t('← Назад', '← Back'), onclick: backTo }) : null,
       el('div', { class: 'spacer' })
     ]);
   }
 
   function parentBanner() {
-    return PARENT ? el('div', { class: 'parent-banner', text: '👀 Режим родителя: все дни открыты.' }) : null;
+    return PARENT ? el('div', { class: 'parent-banner', text: t('👀 Режим родителя: все дни открыты.', '👀 Parent mode: all days are open.') }) : null;
   }
 
   function render() {
@@ -253,8 +266,8 @@
 
   function renderCalendar() {
     // No top bar on the calendar (it would be empty), so the greeting sits higher.
-    app.appendChild(el('h1', { class: 'hello', text: 'Привет, ' + content.name + '!' }));
-    app.appendChild(el('p', { class: 'sub', text: 'Каждый день задания и подарок.' }));
+    app.appendChild(el('h1', { class: 'hello', text: t('Привет, ', 'Hi, ') + content.name + '!' }));
+    app.appendChild(el('p', { class: 'sub', text: t('Каждый день задания и подарок.', 'Tasks and a present every day.') }));
     var banner = parentBanner();
     if (banner) app.appendChild(banner);
 
@@ -264,7 +277,7 @@
       var done = isDone(di);
       var count = (dayState[di] || []).length;
       var cls = 'door ' + (!unlocked ? 'locked' : done ? 'done' : 'open');
-      var state = !unlocked ? 'Закрыто' : done ? 'Пройдено!' : count ? 'Задание ' + (count + 1) : 'Открыто!';
+      var state = !unlocked ? t('Закрыто', 'Locked') : done ? t('Пройдено!', 'Done!') : count ? t('Задание ', 'Task ') + (count + 1) : t('Открыто!', 'Open!');
       doors.appendChild(el('button', {
         class: cls, type: 'button',
         'aria-label': prettyDate(day.unlockDate) + ', ' + state,
@@ -316,8 +329,8 @@
       card.className = 'card search';
       card.appendChild(el('img', { class: 'card-tree search-img', src: 'magnifier.jpg?v=' + (window.__assetVersion || ''), alt: '' }));
       card.appendChild(el('p', { class: 'hint-text', text: hidingHint }));
-      var openAt = PARENT ? 0 : loadHintAt(day.day) + SEARCH_WAIT_MS;
-      var readyText = content.gender === 'f' ? 'Готова отвечать' : content.gender === 'm' ? 'Готов отвечать' : 'Готов(а) отвечать';
+      var openAt = PARENT || DEMO ? 0 : loadHintAt(day.day) + SEARCH_WAIT_MS;
+      var readyText = EN ? 'I’m ready to answer' : content.gender === 'f' ? 'Готова отвечать' : content.gender === 'm' ? 'Готов отвечать' : 'Готов(а) отвечать';
       var openBtn = el('button', {
         class: 'big-btn', type: 'button', text: readyText,
         onclick: function () {
@@ -340,11 +353,11 @@
         class: 'answer', type: 'text', id: 'answer',
         autocomplete: 'off', autocorrect: 'off', autocapitalize: 'off', spellcheck: 'false',
         inputmode: content.keyboard === 'numeric' ? 'numeric' : 'text',
-        enterkeyhint: 'done', 'aria-label': 'Ответ на задание ' + (ti + 1),
-        placeholder: 'Ответ'
+        enterkeyhint: 'done', 'aria-label': t('Ответ на задание ', 'Answer to task ') + (ti + 1),
+        placeholder: t('Ответ', 'Answer')
       });
       var feedback = el('p', { class: 'feedback', role: 'status' });
-      var btn = el('button', { class: 'big-btn', type: 'submit', text: 'Проверить' });
+      var btn = el('button', { class: 'big-btn', type: 'submit', text: t('Проверить', 'Check') });
       var taskText = ti === 0 ? day.firstTask : (solved[ti - 1] || {}).next;
       var form = el('form', {
         autocomplete: 'off',
@@ -361,9 +374,9 @@
       // The present's place was shown in the celebration; this card only says what comes next.
       var lastDay = di === content.days.length - 1;
       app.appendChild(el('div', { class: 'card prize' }, [
-        el('img', { class: 'card-tree' + (lastDay ? ' newyear' : ' envelope'), src: lastDay ? 'days/newyear-' + KID + '.jpg?v=' + (window.__assetVersion || '') : 'envelope.jpg?v=' + (window.__assetVersion || ''),
+        el('img', { class: 'card-tree' + (lastDay ? ' newyear' : ' envelope'), src: lastDay ? 'days/newyear-' + PICS + '.jpg?v=' + (window.__assetVersion || '') : 'envelope.jpg?v=' + (window.__assetVersion || ''),
           onerror: function () { if (this.src.indexOf('tree.jpg') < 0) this.src = TREE_IMG; }, alt: '' }),
-        el('p', { text: lastDay ? 'С Новым годом!' : 'Следующий конверт открой завтра утром.' })
+        el('p', { text: lastDay ? t('С Новым годом!', 'Happy New Year!') : t('Следующий конверт открой завтра утром.', 'Open the next envelope tomorrow morning.') })
       ]));
     }
   }
@@ -373,7 +386,7 @@
     var cd = el('p', { class: 'countdown' });
     app.appendChild(el('div', { class: 'card locked-card' }, [
       el('img', { class: 'card-tree', src: dayImage(day, false), alt: '' }),
-      el('h2', { text: 'Этот день откроется ' + prettyDate(day.unlockDate) + ' в ' + UNLOCK_LABEL }),
+      el('h2', { text: t('Этот день откроется ', 'This day opens on ') + prettyDate(day.unlockDate) + t(' в ', ' at ') + UNLOCK_LABEL }),
       cd
     ]));
     var label = el('span', { class: 'cd-label' });
@@ -416,7 +429,7 @@
         feedback.className = 'feedback wrong';
         feedback.textContent = pick(TRY_AGAIN);
         if (wrongCount[key] >= 3) {
-          feedback.appendChild(el('span', { class: 'nudge', text: 'Если трудно — спроси маму или папу 🙂' }));
+          feedback.appendChild(el('span', { class: 'nudge', text: t('Если трудно — спроси маму или папу 🙂', 'If it’s hard, ask Mum or Dad 🙂') }));
         }
         input.focus();
         return;
@@ -441,12 +454,12 @@
 
     var close = function () { overlay.remove(); render(); };
     var btn = el('button', { class: 'big-btn' + (finale ? ' red' : ''), type: 'button',
-      text: finale ? 'Ура!' : 'Дальше', onclick: close });
+      text: finale ? t('Ура!', 'Hooray!') : t('Дальше', 'Next'), onclick: close });
     var overlay = el('div', { class: 'overlay' + (finale ? ' finale' : ''), role: 'dialog', 'aria-modal': 'true' }, [
       el('div', { class: 'panel' }, finale ? [
         el('img', { class: 'pop-img', src: 'popper.jpg?v=' + (window.__assetVersion || ''), alt: '' }),
-        el('h2', { text: 'Все задания решены!' }),
-        el('p', { class: 'hint-text', text: r.prize || 'Спроси маму или папу!' }),
+        el('h2', { text: t('Все задания решены!', 'All tasks solved!') }),
+        el('p', { class: 'hint-text', text: r.prize || t('Спроси маму или папу!', 'Ask Mum or Dad!') }),
         btn
       ] : [
         el('img', { class: 'pop-img', src: 'popper.jpg?v=' + (window.__assetVersion || ''), alt: '' }),
@@ -464,45 +477,46 @@
 
   function parentPanel() {
     var box = el('div', { class: 'card parent' });
-    box.appendChild(el('h3', { text: 'Для родителей' }));
-    box.appendChild(el('p', { text: 'Сегодня в Финляндии: ' + prettyDate(helsinkiToday()) +
-      '. Без «?parent=1» каждый день открывается в ' + UNLOCK_LABEL + ' по финскому времени.' }));
+    box.appendChild(el('h3', { text: t('Для родителей', 'For parents') }));
+    box.appendChild(el('p', { text: t('Сегодня в Финляндии: ', 'Today in Finland: ') + prettyDate(helsinkiToday()) +
+      t('. Без «?parent=1» каждый день открывается в ' + UNLOCK_LABEL + ' по финскому времени.',
+        DEMO ? '. In the demo every day is open.' : '. Without “?parent=1” each day opens at ' + UNLOCK_LABEL + ' Finnish time.') }));
 
     if (!source) {
-      var pw = el('input', { type: 'password', placeholder: 'Пароль родителя', autocomplete: 'current-password' });
+      var pw = el('input', { type: 'password', placeholder: t('Пароль родителя', 'Parent password'), autocomplete: 'current-password' });
       var msg = el('p', { class: 'err' });
-      var unlockBtn = el('button', { type: 'submit', text: 'Показать ответы' });
+      var unlockBtn = el('button', { type: 'submit', text: t('Показать ответы', 'Show answers') });
       box.appendChild(el('form', {
         class: 'row',
         onsubmit: function (e) {
           e.preventDefault();
           unlockBtn.disabled = true;
-          msg.textContent = 'Проверяю…';
+          msg.textContent = t('Проверяю…', 'Checking…');
           AQ.openParentBox(content, pw.value).then(function (s) {
             source = s; render();
           }).catch(function () {
             unlockBtn.disabled = false;
-            msg.textContent = 'Неверный пароль.';
+            msg.textContent = t('Неверный пароль.', 'Wrong password.');
           });
         }
       }, [pw, unlockBtn]));
       box.appendChild(msg);
-      box.appendChild(el('p', { text: 'С паролем можно увидеть ответы и перейти к любому заданию.' }));
+      box.appendChild(el('p', { text: t('С паролем можно увидеть ответы и перейти к любому заданию.', 'With the password you can see the answers and jump to any task.') }));
     } else {
-      box.appendChild(el('p', { text: 'Нажмите номер, чтобы перейти к заданию (✓ — день пройден).' }));
+      box.appendChild(el('p', { text: t('Нажмите номер, чтобы перейти к заданию (✓ — день пройден).', 'Tap a number to jump to that task (✓ = day done).') }));
     }
 
     content.days.forEach(function (day, di) {
       var done = (dayState[di] || []).length;
       var block = el('div', { class: 'day-block' });
-      block.appendChild(el('h4', { text: 'День ' + day.day + ' · ' + prettyDate(day.unlockDate) +
-        ' · решено ' + done + ' из ' + day.tasks.length }));
+      block.appendChild(el('h4', { text: t('День ', 'Day ') + day.day + ' · ' + prettyDate(day.unlockDate) +
+        t(' · решено ', ' · solved ') + done + t(' из ', ' of ') + day.tasks.length }));
 
       if (source) {
         var sday = source.days[di];
-        if (sday.firstPlace) block.appendChild(el('p', { text: '📍 Задание 1 спрятать: ' + sday.firstPlace }));
+        if (sday.firstPlace) block.appendChild(el('p', { text: t('📍 Задание 1 спрятать: ', '📍 Hide task 1: ') + sday.firstPlace }));
         var table = el('table', null, [el('tr', null, [
-          el('th', { text: '№' }), el('th', { text: 'Ответы' }), el('th', { text: 'Подсказка' })
+          el('th', { text: '№' }), el('th', { text: t('Ответы', 'Answers') }), el('th', { text: t('Подсказка', 'Hint') })
         ])]);
         sday.tasks.forEach(function (t, ti) {
           table.appendChild(el('tr', null, [
@@ -514,7 +528,7 @@
         block.appendChild(table);
         block.appendChild(el('p', { class: 'prize-line', text: '🎁 ' + (sday.prizeHint || '') }));
 
-        var jumps = el('div', { class: 'row' }, [el('span', { text: 'Перейти:' })]);
+        var jumps = el('div', { class: 'row' }, [el('span', { text: t('Перейти:', 'Jump to:') })]);
         for (var k = 0; k <= sday.tasks.length; k++) {
           (function (k) {
             jumps.appendChild(el('button', {
@@ -528,9 +542,9 @@
       }
 
       block.appendChild(el('div', { class: 'row' }, [
-        el('button', { type: 'button', class: 'danger', text: 'Сбросить день ' + day.day,
+        el('button', { type: 'button', class: 'danger', text: t('Сбросить день ', 'Reset day ') + day.day,
           onclick: function () {
-            if (!confirm('Сбросить прогресс дня ' + day.day + ' для ' + content.name + '?')) return;
+            if (!confirm(t('Сбросить прогресс дня ' + day.day + ' для ' + content.name + '?', 'Reset day ' + day.day + ' for ' + content.name + '?'))) return;
             clearSolved(day.day); dayState[di] = []; render();
           } })
       ]));
@@ -538,9 +552,9 @@
     });
 
     box.appendChild(el('div', { class: 'row', style: 'margin-top:16px' }, [
-      el('button', { type: 'button', class: 'danger', text: 'Сбросить весь прогресс: ' + content.name,
+      el('button', { type: 'button', class: 'danger', text: t('Сбросить весь прогресс: ', 'Reset all progress: ') + content.name,
         onclick: function () {
-          if (!confirm('Сбросить весь прогресс для ' + content.name + ' на этом устройстве?')) return;
+          if (!confirm(t('Сбросить весь прогресс для ' + content.name + ' на этом устройстве?', 'Reset all progress for ' + content.name + ' on this device?'))) return;
           content.days.forEach(function (d, di) { clearSolved(d.day); dayState[di] = []; });
           render();
         } })
@@ -572,6 +586,7 @@
     return;
   }
 
+  if (EN) { var loading = app.querySelector('.loading'); if (loading) loading.textContent = 'Loading…'; }
   fetch(KID + '.json', { cache: 'no-cache' })
     .then(function (res) {
       if (!res.ok) throw new Error('HTTP ' + res.status);
@@ -580,12 +595,19 @@
     .then(function (data) {
       if (data.format !== AQ.FORMAT) throw new Error('format');
       content = data;
-      document.title = 'Адвент-квест · ' + content.name;
+      EN = content.lang === 'en';
+      DEMO = !!content.demo;
+      if (content.pictures && /^[a-z0-9_-]+$/.test(content.pictures)) PICS = content.pictures;
+      if (EN) {
+        document.documentElement.lang = 'en';
+        MONTHS = MONTHS_EN; PRAISE = PRAISE_EN; TRY_AGAIN = TRY_AGAIN_EN;
+      }
+      document.title = t('Адвент-квест · ', 'Advent Quest · ') + content.name;
       return restoreAll();
     })
     .then(render)
     .catch(function () {
-      fatal('Не получилось загрузить задания 😕', 'Проверьте ссылку и интернет, потом обновите страницу.');
+      fatal(t('Не получилось загрузить задания 😕', 'Couldn’t load the tasks 😕'), t('Проверьте ссылку и интернет, потом обновите страницу.', 'Check the link and the internet, then reload the page.'));
     });
 
   // A day can unlock while the page is open (e.g. at midnight).
