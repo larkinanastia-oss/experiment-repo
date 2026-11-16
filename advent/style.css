@@ -13,8 +13,8 @@
   --btn-text: #F5E5D6;
   --on-bg: #EEF0E7;
   --on-bg-light: #F7E7CF;
-  --serif: "Playfair Display", Georgia, "Times New Roman", serif;
-  --door: #F5DDC5;
+  --serif: "PT Serif", Georgia, "Times New Roman", serif;
+  --door: #F8F0E7;
   --red: #C04A40;
   --red-dark: #8E352E;
   --green: #1f7a4d;
@@ -114,8 +114,8 @@ body {
   color: var(--on-bg-light);
   font-family: var(--serif);
   font-size: 36px;
-  font-weight: 800;
-  margin: 8px 0 2px;
+  font-weight: 700;
+  margin: 20px 0 2px;   /* 16px page padding + 20px = 36px above the greeting */
 }
 .sub {
   color: #C6C3AF;
@@ -136,12 +136,19 @@ body {
 
 /* ---------- calendar ---------- */
 
+/* One wide card per day, stacked. */
 .doors {
   display: grid;
-  grid-template-columns: repeat(2, 1fr);
+  grid-template-columns: 1fr;
   gap: 14px;
 }
-.doors .door:last-child { grid-column: 1 / -1; }
+/* The picture runs the full height of the card, on the right. */
+.doors .door .badge { top: 0; right: 0; height: 100%; width: auto; aspect-ratio: 1 / 1; }
+/* «декабря» sits to the right of the day number, on the same baseline. */
+.doors .door .date { flex-direction: row; align-items: baseline; gap: 8px; }
+.doors .door .month { margin-top: 0; }
+/* The date and the status sit together, centred in the card's height (like the picture). */
+.doors .door { justify-content: center; gap: 10px; }
 
 .door {
   appearance: none;
@@ -163,9 +170,9 @@ body {
   overflow: hidden;
 }
 .door:active { transform: scale(0.98); }
-.door .date { font-family: var(--serif); font-weight: 800; color: var(--bg-bottom); display: flex; flex-direction: column; }
+.door .date { font-family: var(--serif); font-weight: 700; color: var(--bg-bottom); display: flex; flex-direction: column; }
 .door .day-num { font-size: clamp(33px, 10.5vw, 45px); line-height: 1; }
-.door .month { font-size: 17px; line-height: 1.2; margin-top: 2px; }
+.door .month { font-size: 19px; line-height: 1.2; margin-top: 2px; }
 .door .state { font-size: 17px; font-weight: 500; }
 .door .badge { position: absolute; top: 12px; right: 12px; width: 52px; height: 52px; object-fit: contain; mix-blend-mode: darken; }
 /* The tree picture on the task, hint, end-of-day and locked cards */
@@ -186,7 +193,7 @@ body {
   margin-bottom: 16px;
 }
 
-.day-title { color: var(--on-bg); font-family: var(--serif); font-size: 32px; font-weight: 800; margin: 6px 0 18px; }
+.day-title { color: var(--on-bg); font-family: var(--serif); font-size: 32px; font-weight: 700; margin: 6px 0 18px; }
 
 
 .task-card { background: var(--door); padding-bottom: 25px; }
@@ -269,8 +276,10 @@ body {
 
 .locked-card { text-align: center; background: var(--door); }
 .locked-card .big { font-size: 64px; }
-.locked-card h2 { font-size: 26px; margin: 8px 0; }
+.locked-card h2 { font-size: 15px; margin: 8px 0; color: var(--bg-bottom); }   /* half the countdown (30px) */
 .countdown { font-size: 30px; font-weight: 500; color: var(--red); margin: 8px 0 0; }
+.countdown .cd-label, .countdown .cd-time { display: block; }
+.countdown .cd-time { white-space: nowrap; }
 
 /* ---------- overlay (correct answer / day finished) ---------- */
 
@@ -297,6 +306,7 @@ body {
 }
 @keyframes rise { from { transform: translateY(30px) scale(.9); opacity: 0; } }
 .overlay .big { font-size: 64px; line-height: 1; }
+.overlay .pop-img { display: block; width: 120px; height: 120px; margin: -6px auto 0; mix-blend-mode: darken; }
 .overlay h2 { margin: 10px 0 6px; font-size: 32px; font-weight: 500; color: var(--bg-top); }
 .overlay .hint-text { font-size: 30px; font-weight: 500; margin: 14px 0 4px; line-height: 1.25; color: #7A5640; }
 
@@ -356,3 +366,28 @@ body {
 
 /* Text at the top of the page sits 32px from the left edge (twice the page gutter). */
 .hello, .sub, .day-title { padding-left: 16px; }
+
+/* Padlock for 28 December: nudged 10px to the left (its branch makes it look off-centre). */
+img[src^="days/lock-2.jpg"] { --nudge: -10px; transform: translateX(var(--nudge)); }
+
+/* Party popper in both pop-ups: nudged 10px to the right. */
+.overlay .pop-img { transform: translateX(10px); }
+
+/* End-of-day card: the envelope (or tree on 31 Dec) shown larger. */
+.prize .card-tree { width: 120px; height: 120px; margin-top: -10px; margin-bottom: -6px; }
+/* The envelope is 1.5× the size of the other card pictures (120px → 180px). */
+.prize .card-tree.envelope { width: 180px; height: 180px; margin-top: -14px; margin-bottom: -44px; }
+/* «С Новым годом!» pictures: 1.5× (120px → 180px), and 10px less space below (-6px → -16px). */
+.prize .card-tree.newyear { width: 180px; height: 180px; margin-top: -14px; margin-bottom: -16px; }
+.prize .card-tree.newyear[src^="days/newyear-daria"] { transform: translateX(20px); }
+
+/* Date cards: 5px more space on the left (16px → 21px). */
+.doors .door { padding-left: 21px; }
+
+/* Locked-day screen: padlock twice as big (76px → 152px) and 20px to the right
+   (plus its own nudge, e.g. -10px for 28 December). */
+.locked-card .card-tree { width: 152px; height: 152px; margin-top: -16px; margin-bottom: -18px;
+  transform: translateX(calc(20px + var(--nudge, 0px))); }
+
+/* Hint card: magnifying glass, 1.5× (76px → 114px), 20px to the right. */
+.search .card-tree.search-img { width: 171px; height: 171px; margin-top: -14px; margin-bottom: -34px; transform: translateX(20px); }   /* 1.5 × 114px; ~16px gap to the text */

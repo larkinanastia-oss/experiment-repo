@@ -16,6 +16,10 @@
   function now() { return Date.now(); }
   // Tree picture on the cards; fresh address per visit so an updated picture always shows.
   var TREE_IMG = 'tree.jpg?v=' + (window.__assetVersion || Date.now());
+  function dayImage(day, unlocked) {
+    var name = unlocked ? KID + '-' + day.day : 'lock-' + day.day;
+    return 'days/' + name + '.jpg?v=' + (window.__assetVersion || '');
+  }
 
   var MONTHS = ['января', 'февраля', 'марта', 'апреля', 'мая', 'июня', 'июля',
     'августа', 'сентября', 'октября', 'ноября', 'декабря'];
@@ -117,7 +121,7 @@
     if (d || h) out.push(h + ' ' + plural(h, 'час', 'часа', 'часов'));
     out.push(m + ' ' + plural(m, 'минута', 'минуты', 'минут'));
     if (!d) out.push(sec + ' ' + plural(sec, 'секунда', 'секунды', 'секунд'));
-    return 'Осталось: ' + out.join(' ');
+    return 'Осталось:\n' + out.join(' ');
   }
 
   /* ---------- tiny DOM helper ---------- */
@@ -174,8 +178,8 @@
 
   function confetti(amount) {
     if (window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches) return;
-    // white, gold, deep red, light green, green
-    var colors = ['#FFFFFF', '#D4A93C', '#9E1B2B', '#A8D5A2', '#2E7D4F'];
+    // interface colours: button red, light green, dark green, card cream, beige, plus gold
+    var colors = ['#C04A40', '#527066', '#20302F', '#F8F0E7', '#C9AE96', '#D4A93C'];
     for (var i = 0; i < amount; i++) {
       var p = document.createElement('i');
       var dur = 1.8 + Math.random() * 1.6;
@@ -248,7 +252,7 @@
   }
 
   function renderCalendar() {
-    app.appendChild(header(null));
+    // No top bar on the calendar (it would be empty), so the greeting sits higher.
     app.appendChild(el('h1', { class: 'hello', text: 'Привет, ' + content.name + '!' }));
     app.appendChild(el('p', { class: 'sub', text: 'Каждый день задания и подарок.' }));
     var banner = parentBanner();
@@ -266,7 +270,13 @@
         'aria-label': prettyDate(day.unlockDate) + ', ' + state,
         onclick: function () { go('day', di); }
       }, [
-        el('img', { class: 'badge', src: TREE_IMG, alt: '' }),
+        el('img', {
+          class: 'badge', alt: '',
+          // Locked days show a padlock (days/lock-<day>.jpg); open ones the child's own
+          // picture for that day (days/<kid>-<day>.jpg). Falls back to the tree.
+          src: dayImage(day, unlocked),
+          onerror: function () { if (this.src.indexOf('tree.jpg') < 0) this.src = TREE_IMG; }
+        }),
         el('span', { class: 'date' }, [
           el('span', { class: 'day-num', text: String(+day.unlockDate.slice(8, 10)) }),
           el('span', { class: 'month', text: MONTHS[+day.unlockDate.slice(5, 7) - 1] })
@@ -304,7 +314,7 @@
     if (hidingHint && loadFound(day.day) < ti + 1) {
       // The next task is hidden in the flat: show only where to look, not the task itself.
       card.className = 'card search';
-      card.appendChild(el('img', { class: 'card-tree', src: TREE_IMG, alt: '' }));
+      card.appendChild(el('img', { class: 'card-tree search-img', src: 'magnifier.jpg?v=' + (window.__assetVersion || ''), alt: '' }));
       card.appendChild(el('p', { class: 'hint-text', text: hidingHint }));
       var openAt = PARENT ? 0 : loadHintAt(day.day) + SEARCH_WAIT_MS;
       var readyText = content.gender === 'f' ? 'Готова отвечать' : content.gender === 'm' ? 'Готов отвечать' : 'Готов(а) отвечать';
@@ -351,7 +361,8 @@
       // The present's place was shown in the celebration; this card only says what comes next.
       var lastDay = di === content.days.length - 1;
       app.appendChild(el('div', { class: 'card prize' }, [
-        el('img', { class: 'card-tree', src: TREE_IMG, alt: '' }),
+        el('img', { class: 'card-tree' + (lastDay ? ' newyear' : ' envelope'), src: lastDay ? 'days/newyear-' + KID + '.jpg?v=' + (window.__assetVersion || '') : 'envelope.jpg?v=' + (window.__assetVersion || ''),
+          onerror: function () { if (this.src.indexOf('tree.jpg') < 0) this.src = TREE_IMG; }, alt: '' }),
         el('p', { text: lastDay ? 'С Новым годом!' : 'Следующий конверт открой завтра утром.' })
       ]));
     }
@@ -361,13 +372,28 @@
     var target = unlockTime(day.unlockDate);
     var cd = el('p', { class: 'countdown' });
     app.appendChild(el('div', { class: 'card locked-card' }, [
-      el('img', { class: 'card-tree', src: TREE_IMG, alt: '' }),
+      el('img', { class: 'card-tree', src: dayImage(day, false), alt: '' }),
       el('h2', { text: 'Этот день откроется ' + prettyDate(day.unlockDate) + ' в ' + UNLOCK_LABEL }),
       cd
     ]));
+    var label = el('span', { class: 'cd-label' });
+    var time = el('span', { class: 'cd-time' });
+    cd.appendChild(label);
+    cd.appendChild(time);
     function tick() {
       var left = target - now();
-      cd.textContent = countdownText(left);
+      var parts = countdownText(left).split('\n');
+      label.textContent = parts[0];
+      time.textContent = parts[1] || '';
+      // Shrink the remaining time until it fits on one line (never larger than 30px);
+      // «Осталось:» always uses the same size.
+      var size = 30;
+      time.style.fontSize = size + 'px';
+      while (size > 12 && time.scrollWidth > cd.clientWidth) {
+        size -= 1;
+        time.style.fontSize = size + 'px';
+      }
+      label.style.fontSize = size + 'px';
       if (left <= 0) { stopTimer(); setTimeout(render, 1200); }
     }
     tick();
@@ -418,12 +444,12 @@
       text: finale ? 'Ура!' : 'Дальше', onclick: close });
     var overlay = el('div', { class: 'overlay' + (finale ? ' finale' : ''), role: 'dialog', 'aria-modal': 'true' }, [
       el('div', { class: 'panel' }, finale ? [
-        el('div', { class: 'big', text: '🎉🎁🎉' }),
+        el('img', { class: 'pop-img', src: 'popper.jpg?v=' + (window.__assetVersion || ''), alt: '' }),
         el('h2', { text: 'Все задания решены!' }),
         el('p', { class: 'hint-text', text: r.prize || 'Спроси маму или папу!' }),
         btn
       ] : [
-        el('div', { class: 'big', text: '🎉' }),
+        el('img', { class: 'pop-img', src: 'popper.jpg?v=' + (window.__assetVersion || ''), alt: '' }),
         el('h2', { text: pick(PRAISE) }),
         r.hint ? el('p', { class: 'hint-text', text: r.hint }) : null,
         btn
