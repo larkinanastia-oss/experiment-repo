@@ -32,22 +32,22 @@ All data is **mock data**. No backend, no login, no real sensor.
 ## 3. Screens
 
 ### 3.1 Home (Today)
-- Header: "Good evening, Anna" (mock user), date and day counter "Wed 18 Nov · Day 56 with your sensor" (close to the end of month 2, just before the month-3 retention point)
+- Header: "Good evening, Anna" (mock user), day counter "Day 56 with your sensor" (demo date: Tue 24 Nov) (close to the end of month 2, just before the month-3 retention point)
 - Current glucose card: value (e.g. 5.8 mmol/L), trend arrow, small 24h line chart
 - **This week's challenge card** (the entry point of the experiment). States:
-  - **Not joined yet**: "This week's challenge" + icon and name + dates "Mon 16 – Sun 22 Nov" + time left ("4 days left — you can still join") + a personal "why it matters for you" line from the user's data (e.g. "Your dinners caused your biggest spikes last week, +3.1 mmol/L on average") + button **"Join challenge"**
-  - **Joined**: challenge name, day of the week ("Wednesday · ends Sunday"), Mon–Sun streak dots, button "Done today"
+  - **Not joined yet**: "This week's challenge" + icon and name + dates "Mon 23 – Sun 29 Nov" + time left ("6 days left to join") + a personal "why it matters for you" line from the user's data (e.g. "Your dinners caused your biggest spikes last week, +3.1 mmol/L on average") + button **"Join challenge"**
+  - **Joined**: challenge name, day of the week ("Tuesday · ends Sunday"), Mon–Sun streak dots, button "Done today"
   - **Last day (Sunday), not joined**: same as "Not joined yet", with the copy "Last day — join and try it tonight"
-- **Last week's results card** (only on the Monday after a challenge the user joined): "Your results are ready" → Result screen. It sits above this week's card.
-- **Next week teaser card** (smaller, below this week's card): "Next week" + icon and name + "Starts Monday 23 Nov" + countdown ("in 5 days"). Not tappable to join. It can show one line of what it is about.
+- **Results card**: "Your results are ready" → Result screen, above this week's card. It appears on **Sunday as soon as the user checks in** ("This week's results"; every day is marked, so there's nothing left to wait for), or on the Monday after if they didn't open it yet ("Last week's results"). If they already saw the results on Sunday, Monday sends the "New challenge this week" notification instead of "Your results are ready".
+- **Next week teaser card** (smaller, below this week's card): "Next week" + icon and name + dates "Mon 30 Nov – Sun 6 Dec" + "starts in 6 days". Not tappable to join. It can show one line of what it is about.
 - Small cartridge status line: "Cartridge: 3 days left" (highlighted, so it is clear the user needs a new cartridge to finish the challenge) + button **"Extend subscription"** (see section 3.6)
 
 ### 3.2 Challenge details (join screen)
 Opens when the user taps this week's challenge card before joining.
-- Icon, name, difficulty, dates "Mon 16 – Sun 22 Nov"
+- Icon, name, difficulty, dates "Mon 23 – Sun 29 Nov"
 - What to do, when (target meal / time of day)
 - Why it matters for you (from the user's data)
-- Time left: "Ends Sunday · 4 days left". If the user joins late, explain: "You join from today. Earlier days don't count against you."
+- Time left: "6 days left". If the user joins late, explain: "You join from today. Earlier days don't count against you."
 - Reminder time picker (default from the challenge config, e.g. 20:00 for dinner)
 - Button **"Join challenge"**
 - No way to pick a different challenge and no "See all challenges" link
@@ -60,6 +60,7 @@ Opens when the user taps this week's challenge card before joining.
 - Big one-tap button **"Done today"** (only for today; turns into "✓ Done" after tap). No check-ins for past days.
 - Win rule shown as text, based on the days available since joining (see section 6): e.g. "5 of 7 days is a win", or "3 of 4 days is a win" for someone who joined on Thursday
 - Mini chart: spike after the target meal for each day so far (bar per day, in mmol/L). Done days in one color, missed days in grey, days before joining empty.
+- On Sunday, once the user checks in, the page shows the results right away (banner, before / after chart, stats), same as on the Result screen
 - Early insight once there are 2+ done days with data: "On walk days your dinner spike is 28% lower so far"
 - Next week teaser at the bottom (same as on Home)
 
@@ -82,7 +83,7 @@ Opens from the results card on Monday or from the result notification.
 ### 3.5 Notification mock
 - In-app banner at the top of the phone frame that simulates a push:
   - Monday: "New challenge this week: Walk 10 min after dinner 🚶" (to everyone in the test group)
-  - Mid-week, not joined (once, e.g. Thursday): "4 days left to join this week's challenge"
+  - Mid-week, not joined (once, e.g. Thursday): "4 days left to join this week's challenge" (on Thursday)
   - Daily reminder after joining: "Time for your 10-min walk after dinner 🚶"
   - Monday after a joined week: "Your challenge results are ready"
   - Cartridge runs out tomorrow (not extended): "Your cartridge runs out tomorrow. Extend your subscription so your challenge isn't interrupted."
@@ -91,7 +92,7 @@ Opens from the results card on Monday or from the result notification.
 - Include a "Turn off challenge reminders" option in settings (to track the guardrail metric)
 
 ### 3.6 Cartridge runs out mid-challenge
-On the demo start day (Wednesday) the cartridge has **3 days left**, so it runs out on Saturday, before the challenge ends on Sunday.
+On the demo start day (Tuesday) the cartridge has **3 days left**, so it runs out on Friday, before the challenge ends on Sunday.
 - **Extend subscription** (button on Home while 3 or fewer days are left, and on the paused challenge and result screens) opens a **full-screen resubscribe paywall**, modeled on Runkeeper's: a **green page** that looks clearly different from the rest of the app, white plan cards, a white footer:
   - small label at the top ("Extend subscription" / "⏸ Challenge paused") and a close button (✕)
   - title **"Order new cartridges to continue your challenge"** (not joined: "Order new cartridges to keep tracking") + one short line: "3 days left on your cartridge." / "Your cartridge has run out."
@@ -113,7 +114,7 @@ On the demo start day (Wednesday) the cartridge has **3 days left**, so it runs 
 
 Outside the phone frame (right side on desktop), a small panel for the interview demo:
 - Variant toggle: **Test** (with challenges) / **Control** (same app without the challenge cards)
-- Current demo date and weekday, e.g. "Wed 18 Nov · week 1"
+- Current demo date and weekday, e.g. "Tue 24 Nov · week 1"
 - "Next day" button: moves time forward one day and generates that day's mock glucose. Going past Sunday closes the challenge and opens the next one.
 - "Jump to weekday" (Mon … Sun within the current week), to show joining late, e.g. on Sunday
 - Toggle "user did / didn't do today's task" before moving to the next day
@@ -121,7 +122,7 @@ Outside the phone frame (right side on desktop), a small panel for the interview
 - "Reset" button (clears localStorage)
 - **Event log**: list of analytics events fired (see section 7)
 
-Demo start: **Wednesday 18 Nov 2026**, sensor day 56 (end of month 2), not joined, so joining mid-week is the default story.
+Demo start: **Tuesday 24 Nov 2026**, sensor day 56 (end of month 2), the day after this week's challenge started (Mon 23 Nov), not joined, 6 days left to join.
 
 ## 5. Challenges config and schedule
 
@@ -131,13 +132,13 @@ The **schedule** is a list of weeks. Each week has a `weekStart` date (a Monday)
 
 | Week | Dates | Challenge | Meal | Difficulty | Effect |
 |---|---|---|---|---|---|
-| 1 | Mon 16 – Sun 22 Nov | Walk 10 min after dinner | dinner | Easy | ~30% |
-| 2 | Mon 23 – Sun 29 Nov | Vegetables first at dinner | dinner | Easy | ~20% |
-| 3 | Mon 30 Nov – Sun 6 Dec | Eat protein before carbs at lunch | lunch | Easy | ~20% |
-| 4 | Mon 7 – Sun 13 Dec | Swap sweet breakfast for eggs or yogurt | breakfast | Medium | ~35% |
-| 5 | Mon 14 – Sun 20 Dec | No sugary drinks for 7 days | all_day | Medium | ~15% |
-| 6 | Mon 21 – Sun 27 Dec | Finish dinner 3 hours before bed | night (morning glucose) | Medium | ~10% |
-| 7 | Mon 28 Dec – Sun 3 Jan | Sleep 7+ hours | night (morning glucose) | Medium | ~10% |
+| 1 | Mon 23 – Sun 29 Nov | Walk 10 min after dinner | dinner | Easy | ~30% |
+| 2 | Mon 30 Nov – Sun 6 Dec | Vegetables first at dinner | dinner | Easy | ~20% |
+| 3 | Mon 7 – Sun 13 Dec | Eat protein before carbs at lunch | lunch | Easy | ~20% |
+| 4 | Mon 14 – Sun 20 Dec | Swap sweet breakfast for eggs or yogurt | breakfast | Medium | ~35% |
+| 5 | Mon 21 – Sun 27 Dec | No sugary drinks for 7 days | all_day | Medium | ~15% |
+| 6 | Mon 28 Dec – Sun 3 Jan | Finish dinner 3 hours before bed | night (morning glucose) | Medium | ~10% |
+| 7 | Mon 4 – Sun 10 Jan | Sleep 7+ hours | night (morning glucose) | Medium | ~10% |
 
 After week 7 the schedule repeats (a later version could swap in harder versions, e.g. walk 15 min).
 

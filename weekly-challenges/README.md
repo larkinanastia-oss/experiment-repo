@@ -32,8 +32,8 @@ so pushing the rebuilt `demo/` folder updates the live link.
 
 ## How to demo
 
-The demo starts on **Wednesday 18 Nov 2026** (week 1, sensor day 56, close to the end of month 2), not joined, so joining
-mid-week is the default story. The panel on the right (below the phone on small screens):
+The demo starts on **Tuesday 24 Nov 2026** (week 1 = Mon 23 – Sun 29 Nov, sensor day 56, close to the end of month 2),
+not joined, with 6 days left to join, so joining after the start is the default story. The panel on the right (below the phone on small screens):
 
 - **Variant**: Test (with challenges) / Control (same app, no challenge or teaser cards)
 - **Jump to weekday** — move forward within the week, e.g. to Sunday to show a last-day join
@@ -45,10 +45,10 @@ mid-week is the default story. The panel on the right (below the phone on small 
 - **Reset** — clears localStorage
 - **Event log** — every analytics event with its properties (also in `console.log`)
 
-**Cartridge story:** on Wednesday the cartridge has 3 days left, so it runs out on Saturday, before the challenge ends.
-- Tap **Extend subscription** on Home before Saturday → a resubscribe paywall opens (two mock plans). **Subscribe** →
-  the next cartridge starts on time and nothing is interrupted. **Not now** closes it.
-- Don't extend → Friday shows a "runs out tomorrow" notice, Saturday a "has run out" notice. There's no glucose data,
+**Cartridge story:** on Tuesday the cartridge has 3 days left, so it runs out on Friday, before the challenge ends.
+- Tap **Extend subscription** on Home before Friday → a full-screen paywall opens (two mock plans). **Extend subscription** →
+  the next cartridge starts on time and nothing is interrupted. **✕** closes it.
+- Don't extend → Thursday shows a "runs out tomorrow" notice, Friday a "has run out" notice. There's no glucose data,
   the challenge is paused, and days without a sensor don't count toward the win rule. Extending then brings
   a new cartridge the next day.
 

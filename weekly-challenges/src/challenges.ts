@@ -114,7 +114,7 @@ export const CHALLENGES: Challenge[] = [
 
 /**
  * Weekly schedule, the same for every user (like a game event).
- * Week 1 starts Monday 16 Nov 2026. After the last week the schedule repeats.
+ * Week 1 starts Monday 23 Nov 2026. After the last week the schedule repeats.
  */
 export const SCHEDULE: string[] = [
   'walk-dinner-10',

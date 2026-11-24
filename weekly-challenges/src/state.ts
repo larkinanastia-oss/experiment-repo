@@ -2,13 +2,13 @@ import { byId, Challenge, SCHEDULE } from './challenges'
 import { avg, dayReadings, lastWeekSpikes, REAL_MEALS, RealMeal, reductionsFor, targetCurve, targetSpike } from './glucose'
 
 /* ---------- calendar ----------
- * "Sensor day" is the app's clock. Sensor day 56 = Wednesday 18 Nov 2026 (demo start),
+ * "Sensor day" is the app's clock. Sensor day 56 = Tuesday 24 Nov 2026 (demo start),
  * close to the end of the user's second month (day 60), where month-3 retention is decided.
- * Week 0 (shown as "week 1") = Mon 16 – Sun 22 Nov = sensor days 54–60.
+ * Week 0 (shown as "week 1") = Mon 23 – Sun 29 Nov = sensor days 55–61.
  */
 export const FIRST_DAY = 56
-const WEEK0_MONDAY_DAY = 54
-const WEEK0_MONDAY_DATE = Date.UTC(2026, 10, 16)
+const WEEK0_MONDAY_DAY = 55
+const WEEK0_MONDAY_DATE = Date.UTC(2026, 10, 23)
 export const WEEKDAYS = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']
 export const WEEKDAY_LONG = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday']
 const MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
@@ -76,14 +76,14 @@ export const initialState: State = {
   sensorDay: FIRST_DAY,
   joins: {},
   remindersOn: true,
-  cartridgeEnd: FIRST_DAY + 3, // 3 days left on the demo start day: it runs out on Saturday, mid-challenge
+  cartridgeEnd: FIRST_DAY + 3, // 3 days left on the demo start day: it runs out on Friday, mid-challenge
   extended: false,
   noSensorDays: [],
   willDo: true,
   events: [],
 }
 
-const KEY = 'weekly-challenges-state-v4'
+const KEY = 'weekly-challenges-state-v5'
 
 export function loadState(): State {
   try {
@@ -115,8 +115,19 @@ export const today = (s: State) => weekdayOf(s.sensorDay)
 export const currentJoin = (s: State): Join | undefined => s.joins[thisWeek(s)]
 export const daysLeft = (s: State) => 7 - today(s) // including today
 
-/** Last week's join whose results the user hasn't opened yet. */
+/** Sunday and checked in: every day of the week is marked, so the results are ready the same day. */
+export function finishedToday(s: State): boolean {
+  return today(s) === 6 && !!currentJoin(s)?.done.includes(6)
+}
+
+/** Results ready for a week: the week has ended, or it's Sunday and the user checked in. */
+export function resultReady(s: State, week: number): boolean {
+  return !!s.joins[week]?.completed || (week === thisWeek(s) && finishedToday(s))
+}
+
+/** Week whose results are ready but not opened yet: this week once it's finished, otherwise last week. */
 export function pendingResultWeek(s: State): number | null {
+  if (finishedToday(s)) return currentJoin(s)!.resultViewed ? null : thisWeek(s)
   const w = thisWeek(s) - 1
   const j = s.joins[w]
   return j?.completed && !j.resultViewed ? w : null

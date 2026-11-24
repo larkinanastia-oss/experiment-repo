@@ -105,7 +105,7 @@ function stepDay(state: State): { s: State; banner: Banner | null } {
   if (thisWeek(s) !== prevWeek) {
     s = completeWeek(s, prevWeek)
     if (cartridgeNotice) return notify(s, cartridgeNotice)
-    return notify(s, s.joins[prevWeek] ? 'result' : 'new_challenge')
+    return notify(s, s.joins[prevWeek] && !s.joins[prevWeek].resultViewed ? 'result' : 'new_challenge')
   }
   if (cartridgeNotice) return notify(s, cartridgeNotice)
   if (sensorOut(s)) return { s, banner: null }

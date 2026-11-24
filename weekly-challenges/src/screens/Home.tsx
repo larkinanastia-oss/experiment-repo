@@ -78,7 +78,7 @@ export default function Home({ ctx }: { ctx: Ctx }) {
 
       {isTest && resultWeek !== null && (
         <section className="card challenge-card challenge-done" onClick={() => go({ name: 'result', week: resultWeek })} role="button">
-          <span className="tag tag-gold">Last week's results</span>
+          <span className="tag tag-gold">{resultWeek === thisWeek(state) ? "This week's results" : "Last week's results"}</span>
           <h2>{byId(state.joins[resultWeek].challengeId).icon} Your results are ready</h2>
           <p className="muted">{resultTeaser(state, resultWeek)}</p>
           <button className="btn btn-gold">See my results</button>

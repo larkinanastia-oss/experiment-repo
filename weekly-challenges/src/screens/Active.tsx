@@ -3,6 +3,7 @@ import { Bar, BarChart, Cell, LabelList, ReferenceLine, ResponsiveContainer, XAx
 import type { Ctx } from '../App'
 import { MEAL_LABEL } from '../challenges'
 import { Pill, TopBar, WeekDots } from '../components'
+import { ResultSummary } from './Result'
 import { avg } from '../glucose'
 import {
   baselineSpike, challengeForWeek, currentJoin, fmt, sensorOut, thisWeek, today, WEEKDAYS, weekDays, weekRange,
@@ -35,6 +36,8 @@ export default function Active({ ctx }: { ctx: Ctx }) {
   }))
   const doneSpikes = days.filter((d) => d.spike !== null && (d.status === 'done' || d.status === 'today-done')).map((d) => d.spike!)
   const insightPct = doneSpikes.length ? Math.round((1 - avg(doneSpikes) / baseline) * 100) : null
+  // Sunday and checked in: every day is marked, so show the results right away.
+  const finished = idx === 6 && doneToday
   const showInsight = doneSpikes.length >= 2 && insightPct !== null && insightPct > 0
 
   return (
@@ -64,7 +67,9 @@ export default function Active({ ctx }: { ctx: Ctx }) {
         </button>
       )}
 
-      {showInsight && (
+      {finished && <ResultSummary state={state} week={w} />}
+
+      {showInsight && !finished && (
         <section className="card insight">
           <span className="insight-icon">💡</span>
           <p>On {ch.dayLabel} your {MEAL_LABEL[ch.targetMeal]} spike is <strong>{insightPct}% lower</strong> so far</p>
